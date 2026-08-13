@@ -152,9 +152,8 @@ async function deliverAfterPayment(chatId, userId, paymentId) {
 }
 
 async function deliverConversionFile(chatId, fileId, paymentId) {
-  const dlRes = await fetch(`${BACKEND}/api/download/${fileId}`, {
-    headers: { "x-payment-key": paymentId }
-  });
+  
+  const dlRes = await fetch(`${BACKEND}/api/download/${fileId}`, { headers: { "x-customer-ref": String(chatId) } });
   const dlData = await dlRes.json();
 
   if (!dlRes.ok || !dlData.success) {
