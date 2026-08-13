@@ -1,0 +1,297 @@
+# Amharic & Multilingual Document Conversion Architecture
+
+## Overview
+
+የፕሮጀክታችን ዋና ዓላማ ፈጣን ብቻ የሆነ conversion service መፍጠር ሳይሆን፣ ተጠቃሚዎች ከservice መጀመር በኋላ የሚያገኙት ልምድ የተረጋጋ (stable), ታማኝ (reliable) እና ሊያድግ የሚችል (scalable) እንዲሆን ማድረግ ነው።
+
+Amharic document support የፕሮጀክቱ አስፈላጊ ክፍል ሲሆን English እና ሌሎች ቋንቋዎችንም ለመደገፍ የሚችል architecture ይኖረዋል።
+
+---
+
+# 1. Normal Document Conversion
+
+Normal document conversion ማለት ፋይሉ ውስጥ ጽሑፉ በቀጥታ የሚገኝ (selectable text) ሲሆን ነው።
+
+Examples:
+
+* Amharic Unicode documents
+* English documents
+* Mixed Amharic + English documents
+
+Supported conversions:
+
+* PDF → Word
+* Word → PDF
+* PDF → Excel
+* Compression
+* Lock / Unlock
+* Other document processing features
+
+Architecture:
+
+```
+User Upload
+
+↓
+
+Document Analyzer
+
+↓
+
+Text-based Document
+
+↓
+
+LibreOffice Conversion Engine
+
+↓
+
+Output File
+```
+
+---
+
+# 2. Amharic Unicode Support
+
+Amharic Unicode documents በትክክል ለመቀየር:
+
+* Unicode text handling
+* Proper font support
+* Character encoding management
+
+ይጠበቃል።
+
+Normal Amharic Unicode documents:
+
+```
+Amharic Text PDF
+
+↓
+
+Text Extraction
+
+↓
+
+Conversion
+
+↓
+
+Word / PDF Output
+```
+
+በመደበኛ conversion engine ሊሰሩ ይችላሉ።
+
+---
+
+# 3. Scanned Document Conversion
+
+Scanned PDF የተለየ ሂደት ይፈልጋል።
+
+ምክንያቱም scanned PDF ውስጥ ጽሑፍ አይኖርም፤ image ብቻ ሊሆን ይችላል።
+
+Architecture:
+
+```
+Scanned PDF
+
+↓
+
+Image Processing
+
+↓
+
+OCR Engine
+
+↓
+
+Text Recognition
+
+↓
+
+Document Reconstruction
+
+↓
+
+Conversion Engine
+
+↓
+
+Output File
+```
+
+---
+
+# 4. OCR Scope
+
+OCR ለሚከተሉት ያገለግላል:
+
+* Scanned Amharic documents
+* Scanned English documents
+* Image-based PDFs
+* Old document processing
+
+OCR ዋና ተግባሩ:
+
+Image → Text Recognition
+
+ነው።
+
+ነገር ግን conversion ላይ ብቻውን አይበቃም።
+
+የሚያስፈልገው:
+
+* Text recognition
+* Paragraph reconstruction
+* Table recognition
+* Layout preservation
+
+ነው።
+
+---
+
+# 5. Amharic Conversion Challenges
+
+## A. Old Amharic Fonts
+
+አንዳንድ የቆዩ Amharic documents:
+
+* Legacy fonts
+* Non-Unicode encoding
+
+ሊጠቀሙ ይችላሉ።
+
+Potential solution:
+
+```
+Font Detection
+
+↓
+
+Encoding Conversion
+
+↓
+
+Unicode Text
+
+↓
+
+Document Conversion
+```
+
+---
+
+## B. Scanned Amharic OCR
+
+Scanned Amharic OCR ትልቁ ፈተና ነው።
+
+ምክንያቶች:
+
+* Limited training data compared with English
+* Different fonts
+* Image quality
+* Complex characters
+* Layout restoration
+
+Solution:
+
+OCR improvement + testing + user feedback.
+
+---
+
+# 6. English vs Amharic OCR
+
+English OCR በአብዛኛው የበሰለ ሲሆን:
+
+* More training data
+* More years of development
+* Wider usage
+
+አለው።
+
+ግን English scanned documents ላይም:
+
+* Poor scans
+* Tables
+* Handwriting
+* Old documents
+
+ችግር ሊኖር ይችላል።
+
+Amharic scanned OCR ደግሞ ተጨማሪ ማሻሻያ እና testing ይፈልጋል።
+
+---
+
+# 7. Final Conversion Architecture
+
+System ሁሉንም document ወደ OCR አይልክም።
+
+የተለያዩ paths ይኖራሉ።
+
+```
+User Upload
+
+↓
+
+Document Analyzer
+
+↓
+
+Is Text Document?
+
+        YES                    NO
+
+        ↓                      ↓
+
+Normal Conversion        OCR Pipeline
+
+        ↓                      ↓
+
+        └──────────┬───────────┘
+
+                   ↓
+
+          Final Conversion
+
+                   ↓
+
+          Temporary File
+
+                   ↓
+
+             Auto Delete
+```
+
+---
+
+# 8. Technology Decision
+
+## Core Conversion Engine
+
+LibreOffice:
+
+* Open source
+* Server compatible
+* Stable conversion
+* Supports major document formats
+
+## OCR Layer
+
+Separate service layer:
+
+* Only used when needed
+* Does not slow down normal conversions
+* Can be improved independently
+
+---
+
+# Final Principle
+
+Normal conversions must remain:
+
+* Fast
+* Stable
+* Reliable
+
+Advanced processing (OCR, scanned documents, old fonts) runs as an intelligent layer without affecting the normal text-conversion path.
+
+The goal is not only to launch quickly, but to build a reliable document platform that can grow over time.

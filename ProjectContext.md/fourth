@@ -1,0 +1,456 @@
+# PROJECT CONTEXT — PAYMENT SYSTEM
+
+## Local & International Payment Architecture
+
+### 1. Payment System Overview
+
+The platform supports two payment categories:
+
+* 🇪🇹 Local Payment — Ethiopia
+* 🌎 International Payment — Global Users
+
+The payment system must provide a simple, clean, secure, and compact user experience.
+
+Users select only their preferred payment provider. Internal payment routing, gateway selection, verification, fallback logic, and payment processing are handled by the backend.
+
+---
+
+# 2. PRICING DISPLAY PRINCIPLE
+
+Payment amounts must **NOT** appear at the top of the shared payment popup.
+
+The service price is displayed on the **main website / feature card** before the user reaches the payment popup.
+
+Example:
+
+> **PDF to Word**
+> *3 ETB for high-quality conversion*
+
+The international pricing/access information is also displayed on the main website.
+
+When the user clicks:
+
+> **Save to Device**
+
+the shared payment popup appears.
+
+The popup is primarily for **payment-provider selection**.
+
+The popup should NOT initially display:
+
+> 3 ETB
+
+or
+
+> $1
+
+because the same popup is used by both local and international users.
+
+---
+
+# 3. PAYMENT POPUP — FINAL COMPACT LAYOUT
+
+The payment popup must prioritize **horizontal layout** and compactness.
+
+The payment options should extend **from left to right as much as reasonably possible**, rather than creating unnecessary vertical length.
+
+The layout is:
+
+```text
+🇪🇹  [ Telebirr ] [ CBE ] [ Dashen ] [ Abyssinia ]
+        Logo         Logo      Logo        Logo
+
+
+🌎  [ Airtm ] [ Paddle ] [ PayPal ]
+        Logo       Logo        Logo
+```
+
+### Layout Rules
+
+* Local payment providers are arranged horizontally.
+* International payment providers are arranged horizontally.
+* Provider names appear with their official logos.
+* The layout should remain compact.
+* Do NOT unnecessarily stack the payment providers vertically.
+* Do NOT create separate large cards for each provider.
+* The popup should use the available horizontal space efficiently.
+* The design should be responsive for mobile/Android screens while preserving the horizontal-first principle as much as reasonably possible.
+* Chapa and SantimPay are not displayed to the user.
+* Local and international payment options appear in the same popup.
+* No "Select International Gateway" step exists.
+* The popup does not initially display the payment amount.
+
+---
+
+# 4. 🇪🇹 LOCAL PAYMENT SYSTEM
+
+### Local Pricing
+
+**3 ETB per service**
+
+The price is displayed on the relevant feature/service card on the main website.
+
+### User Flow
+
+```text
+Feature / Service
+      ↓
+Service price displayed
+      ↓
+User performs service
+      ↓
+Save to Device
+      ↓
+Payment Popup
+      ↓
+🇪🇹 Telebirr / CBE / Dashen / Abyssinia
+      ↓
+Official Secure Payment Flow
+      ↓
+Backend Verification
+      ↓
+Save to Device
+```
+
+The user does not see internal payment infrastructure such as Chapa or SantimPay.
+
+---
+
+# 5. LOCAL PAYMENT ROUTING
+
+The intended backend architecture is:
+
+```text
+User selects local payment method
+            ↓
+      Backend Payment Layer
+            ↓
+       Chapa — Primary
+            ↓
+    SantimPay — Secondary
+            ↓
+Direct provider integration /
+fallback where technically available
+            ↓
+      Payment Verification
+            ↓
+        Access Granted
+```
+
+The user never needs to select Chapa or SantimPay.
+
+Backend routing is automatic.
+
+---
+
+# 6. PAYMENT CREDENTIAL SECURITY
+
+The platform must never collect or store users' payment passwords or PINs.
+
+For example:
+
+**Telebirr PIN/password must NOT be entered into our own website popup.**
+
+After selecting a provider, the payment continues through the provider's official secure payment interface, redirect, SDK, or officially supported mechanism.
+
+```text
+Our Website
+    ↓
+Select Payment Provider
+    ↓
+Official Secure Payment Flow
+    ↓
+User Authentication
+    ↓
+Provider Confirmation
+    ↓
+Backend Verification
+```
+
+Never store:
+
+* Telebirr PIN
+* CBE password/PIN
+* Dashen password/PIN
+* Abyssinia password/PIN
+* PayPal password
+* Paddle credentials
+* Airtm credentials
+
+---
+
+# 7. 🌎 INTERNATIONAL PAYMENT SYSTEM
+
+### International Pricing
+
+**$1 / 7 Days**
+
+The international pricing/access information is displayed on the main website.
+
+It is not displayed as the initial amount inside the shared payment popup.
+
+### International Payment Options
+
+```text
+🌎  [ Airtm ] [ Paddle ] [ PayPal ]
+        Logo       Logo        Logo
+```
+
+### International User Flow
+
+```text
+Feature / Service
+      ↓
+International pricing displayed
+      ↓
+User clicks Save to Device
+      ↓
+Payment Popup
+      ↓
+🌎 Airtm / Paddle / PayPal
+      ↓
+Official Secure Payment Flow
+      ↓
+Payment Verification
+      ↓
+7-Day Access Activated
+      ↓
+Service Available
+```
+
+There is no additional:
+
+> Select International Gateway
+
+step.
+
+---
+
+# 8. 🌎 INTERNATIONAL 7-DAY ACCESS
+
+International users purchase:
+
+> **$1 / 7 Days**
+
+The active 7-day access can be used for the platform's available services, including:
+
+* PDF to Word
+* Word to PDF
+* PDF Compression
+* File Lock / Unlock
+* PDF to Excel
+* PDF Editing / Signing
+* Document Search
+* Document Preview
+* Document Download
+
+---
+
+# 9. DAILY USAGE PROTECTION
+
+The international plan has an internal usage protection:
+
+**Maximum 10 services per 24-hour period.**
+
+This limit is NOT displayed before purchase.
+
+The user sees:
+
+> **$1 / 7 Days**
+
+If the user attempts an 11th service after reaching the daily limit:
+
+```text
+10 services used
+      ↓
+11th service attempted
+      ↓
+Daily limit reached
+      ↓
+Service becomes available again
+when the next 24-hour period applies
+```
+
+The 7-day access period continues normally.
+
+The limit is enforced by the backend/database.
+
+---
+
+# 10. PAYMENT VERIFICATION
+
+Payment confirmation must never rely only on frontend logic.
+
+```text
+User Payment
+     ↓
+Payment Provider
+     ↓
+Provider Confirmation / Webhook
+     ↓
+Backend Verification
+     ↓
+Payment Marked Successful
+     ↓
+Access Granted
+     ↓
+Service / Save to Device
+```
+
+The backend must protect against:
+
+* Fake payment confirmation
+* Duplicate payment
+* Reused transactions
+* Unauthorized access
+* Payment bypass
+* Frontend manipulation
+
+---
+
+# 11. MERCHANT / REVENUE ACCOUNT
+
+Customer payments should be processed through appropriate merchant/business accounts supported by each payment provider.
+
+General model:
+
+```text
+Customer
+   ↓
+Payment Provider
+   ↓
+Merchant / Business Balance
+   ↓
+Payout
+   ↓
+Supported Bank / Withdrawal Account
+```
+
+Provider-specific payout accounts, KYC requirements, settlement methods, withdrawal options, and eligibility must be verified before production implementation.
+
+---
+
+# 12. PAYMENT PROVIDER SUMMARY
+
+## 🇪🇹 Local
+
+### User-facing
+
+```text
+🇪🇹  [ Telebirr ] [ CBE ] [ Dashen ] [ Abyssinia ]
+        Logo         Logo      Logo        Logo
+```
+
+### Backend infrastructure
+
+* Chapa — Primary
+* SantimPay — Secondary fallback
+* Direct provider integration where technically and legally available
+
+The user does not select the backend gateway.
+
+---
+
+## 🌎 International
+
+### User-facing
+
+```text
+🌎  [ Airtm ] [ Paddle ] [ PayPal ]
+        Logo       Logo       Logo
+```
+
+Provider availability, Ethiopia eligibility, KYC requirements, settlement options, supported currencies, fees, taxes, and payout methods must be verified from official provider documentation before production implementation.
+
+---
+
+# 13. PAYMENT UX PRINCIPLE
+
+The payment experience must be:
+
+**Simple → Fast → Clear → Secure**
+
+### 🇪🇹 Local
+
+**Service price → Save to Device → Payment Popup → Select provider → Secure payment → Verification → Save**
+
+### 🌎 International
+
+**$1 / 7 Days → Save to Device → Payment Popup → Select provider → Secure payment → Verification → Access**
+
+The popup remains focused on payment-provider selection.
+
+---
+
+# 14. FINAL PAYMENT POPUP
+
+The final intended compact arrangement is:
+
+```text
+🇪🇹  [ Telebirr ] [ CBE ] [ Dashen ] [ Abyssinia ]
+       Logo         Logo      Logo        Logo
+
+
+🌎  [ Airtm ] [ Paddle ] [ PayPal ]
+       Logo       Logo        Logo
+```
+
+**This horizontal-first arrangement is the design reference.**
+
+The popup should use horizontal space efficiently and should not become unnecessarily tall.
+
+Each provider should use its **official logo** and recognizable name.
+
+The amount is displayed on the main feature/service interface, not as the initial amount inside the shared popup.
+
+---
+
+# 15. STABILITY-FIRST REQUIREMENT
+
+The project priority is not to launch as quickly as possible.
+
+The core principle is:
+
+> **Build the system correctly and stably so that users do not experience payment, conversion, download, or service failures after launch.**
+
+Before production launch, test:
+
+* Successful payment
+* Failed payment
+* Cancelled payment
+* Delayed confirmation
+* Duplicate payment
+* Webhook failure
+* Network failure
+* Expired 7-day access
+* Daily usage limit
+* Refund handling
+* Unauthorized access
+* Payment verification failure
+
+No payment provider or pricing architecture is considered fully final until its real technical requirements, availability, fees, KYC, payout options, and legal/tax requirements have been verified.
+
+---
+
+# FINAL USER-FACING PAYMENT MODEL
+
+### 🇪🇹 Local
+
+**3 ETB / service**
+
+### 🌎 International
+
+**$1 / 7 Days**
+
+### Shared Payment Popup
+
+```text
+🇪🇹  [ Telebirr ] [ CBE ] [ Dashen ] [ Abyssinia ]
+       Logo         Logo      Logo        Logo
+
+
+🌎  [ Airtm ] [ Paddle ] [ PayPal ]
+       Logo       Logo        Logo
+```
+
+**Horizontal-first. Compact. Logo + name. No unnecessary vertical stacking.**

@@ -1,0 +1,174 @@
+# Download Documents Feature – Final Architecture (Updated)
+
+## 1. Home Page
+
+Home Page ላይ የሚኖሩት 6 ዋና Features:
+
+* PDF → Word
+* Word → PDF
+* PDF Compression
+* PDF Lock / Unlock
+* PDF → Excel
+* PDF Edit & Sign
+
+ከእነዚህ በታች **Document Search** የሚል Search Box ይኖራል።
+
+ተጠቃሚው Search Box ውስጥ ፍለጋ መጻፍ ወይም Search መጫን ሲጀምር፣ **በራስ-ሰር (Automatically)** ወደ **Documents Page** ይወሰዳል።
+
+Home Page ላይ Search Results አይታዩም።
+
+---
+
+# 2. Documents Page
+
+Documents Page የDocument Discovery ማዕከል ይሆናል።
+
+User የፈለገው ቃል በራስ-ሰር ተልኮ Search Results ይታያሉ።
+
+Workflow:
+
+Search
+
+↓
+
+Documents Page
+
+↓
+
+Search Results
+
+↓
+
+Open / Preview
+
+↓
+
+Payment (if required)
+
+↓
+
+Save to Device
+
+---
+
+# 3. Search Results Strategy
+
+Search Results በAmazon ዓይነት Discovery Strategy ይደራጃሉ።
+
+Top Results
+
+↓
+
+Related Results
+
+↓
+
+Similar Documents
+
+↓
+
+More Like This
+
+ይህ ተጠቃሚው ተመሳሳይ ሰነዶችን በቀላሉ እንዲያገኝ ያደርጋል።
+
+---
+
+# 4. Result Card
+
+እያንዳንዱ Result የሚያሳየው:
+
+* Document Title
+* Description
+* Language
+* Category
+* File Type
+* File Size
+* Number of Pages
+* Publisher / Source
+* Year / Edition
+
+---
+
+# 5. Preview Page
+
+Preview Page ላይ የሚታዩት:
+
+* Cover (ካለ)
+* Full Title
+* Description
+* Language
+* Pages
+* File Size
+* Publisher / Source
+* Edition
+* Related Documents
+* Similar Documents
+
+ከዚያ Payment (ካስፈለገ) እና Save to Device ይፈጸማሉ።
+
+---
+
+# 6. File Lifetime Policy
+
+User ፋይሉን Search አድርጎ ካገኘ፣ Payment ካጠናቀቀ (ካስፈለገ) እና Save to Device ካደረገ በኋላ፣ ያ ፋይል በServer ላይ ያለው ጊዜያዊ ቅጂ **ከ3 ደቂቃ በኋላ በራስ-ሰር ይሰረዛል**።
+
+ተጠቃሚው ከ3 ደቂቃ በኋላ ድጋሚ ያንን ፋይል ከፈለገ፣ እንደ አዲስ Search ማድረግ አለበት።
+
+በServer ላይ የተዘጋጀው ጊዜያዊ ፋይል በቋሚነት አይቆይም።
+
+---
+
+# 7. Search Engine Architecture
+
+Search
+
+↓
+
+Our Search Index (Metadata Only)
+
+↓
+
+Results Ranking
+
+↓
+
+Reference Source
+
+↓
+
+Temporary Server Processing
+
+↓
+
+Save to User Device
+
+↓
+
+Server Auto Delete (3 Minutes)
+
+Search Index ውስጥ የሚቀመጡት:
+
+* Title
+* Description
+* Language
+* Category
+* File Type
+* File Size
+* Pages
+* Publisher / Source
+* Search Keywords
+
+የፋይሉ ዋና ይዘት (Document File) በቋሚነት አይከማችም።
+
+---
+
+# 8. Design Principles
+
+* Home Page ንጹህ እና ፈጣን ይሆናል።
+* Documents Page ሙሉ Search Experience ይሰጣል።
+* Search Results በRelevance Ranking ይደራጃሉ።
+* Related Documents እና Similar Documents ይታያሉ።
+* Payment (ካስፈለገ) ከSave to Device በፊት ይፈጸማል።
+* የServer ጊዜያዊ ፋይሎች በ3 ደቂቃ ውስጥ በራስ-ሰር ይሰረዛሉ።
+* ከ3 ደቂቃ በኋላ ተጠቃሚው ፋይሉን እንደገና ለማግኘት Search እንደ አዲስ መጀመር አለበት።
+* Architecture ወደፊት ሚሊዮኖች የሚቆጠሩ Documents እንኳን እንዲደግፍ ተዘጋጅቷል።

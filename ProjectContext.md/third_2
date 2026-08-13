@@ -1,0 +1,272 @@
+# Technology Stack Decision – Document Conversion System
+
+## 1. Backend Platform
+
+### Node.js (Express)
+
+Node.js የbackend መሠረት ሆኖ ይጠቀማል።
+
+Responsibilities:
+
+* File upload handling
+* User request management
+* Conversion job control
+* Payment integration
+* API communication with frontend
+* Temporary file management
+* Auto delete scheduling
+
+Architecture:
+
+```text
+Framer Frontend
+
+        ↓
+
+Node.js Backend API
+
+        ↓
+
+Conversion Services
+```
+
+---
+
+# 2. Core Conversion Engine
+
+## LibreOffice
+
+LibreOffice የዋና conversion engine ይሆናል።
+
+Used for:
+
+* PDF → Word
+* Word → PDF
+* Document format conversion
+* Basic layout preservation
+
+Reasons:
+
+* Open source
+* Free for commercial use
+* Server environment compatible
+* Supports multiple document formats
+* Stable and widely tested
+
+LibreOffice የnormal conversion path ይይዛል።
+
+---
+
+# 3. OCR Processing Layer
+
+OCR ለnormal conversion አይገባም።
+
+የሚጠቀመው:
+
+* Scanned PDF
+* Image documents
+* Non-selectable text files
+
+Workflow:
+
+```text
+Scanned PDF
+
+↓
+
+OCR Engine
+
+↓
+
+Recognized Text
+
+↓
+
+Document Reconstruction
+
+↓
+
+LibreOffice Conversion
+```
+
+OCR እንደ active processing layer ይሰራል።
+
+---
+
+# 4. Document Processing Layer
+
+ይህ layer በOCR እና conversion መካከል ይሰራል።
+
+Responsibilities:
+
+* Text cleanup
+* Character normalization
+* Paragraph detection
+* Table handling
+* Layout preparation
+
+በተለይ:
+
+* Amharic documents
+* Mixed language documents
+* Complex layouts
+
+ላይ ይረዳል።
+
+---
+
+# 5. File Processing Architecture
+
+```text
+User Upload
+
+↓
+
+Node.js Backend
+
+↓
+
+File Analyzer
+
+↓
+
+--------------------------------
+
+Normal File
+
+↓
+
+LibreOffice
+
+
+OR
+
+
+Scanned File
+
+↓
+
+OCR Layer
+
+↓
+
+Document Processing
+
+↓
+
+LibreOffice
+
+--------------------------------
+
+↓
+
+Output File
+
+↓
+
+Temporary Storage
+
+↓
+
+Auto Delete
+```
+
+---
+
+# 6. Storage Strategy
+
+System ቋሚ የuser document storage አይጠቀምም።
+
+Temporary processing files only.
+
+Flow:
+
+```text
+Upload
+
+↓
+
+Temporary Processing
+
+↓
+
+Conversion
+
+↓
+
+User Save to Device
+
+↓
+
+Temporary File Delete
+```
+
+File lifetime policy:
+
+* Server temporary files are automatically deleted according to project cleanup rules.
+* User downloaded files remain only on the user's device.
+
+---
+
+# 7. Performance Strategy
+
+Normal users በOCR processing አይጫኑም።
+
+System routing:
+
+```text
+Normal Document
+
+↓
+
+Fast Conversion Path
+
+
+Scanned Document
+
+↓
+
+Advanced OCR Path
+```
+
+Benefits:
+
+* Faster response
+* Lower server load
+* Better stability
+* Easier scaling
+
+---
+
+# 8. Future Upgrade Possibilities
+
+Architecture ወደፊት ለሚከተሉት ክፍት ነው:
+
+* Better OCR models
+* AI document correction
+* Advanced table extraction
+* Document quality improvement
+* More language support
+* Enterprise document services
+
+---
+
+# Final Technology Decision
+
+| Component         | Technology        | Purpose                      |
+| ----------------- | ----------------- | ---------------------------- |
+| Frontend          | Framer            | User interface               |
+| Backend           | Node.js + Express | API and business logic       |
+| Conversion Engine | LibreOffice       | Normal document conversion   |
+| OCR Layer         | OCR Engine        | Scanned document recognition |
+| Processing Layer  | Custom service    | Cleanup and reconstruction   |
+| Storage           | Temporary storage | Short-term processing only   |
+
+## Core Principle
+
+The system must prioritize:
+
+1. Stability over speed of development
+2. Reliable user experience
+3. Separation between normal and advanced processing
+4. Ability to improve without rebuilding the entire platform
