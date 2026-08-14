@@ -3,12 +3,18 @@ const path = require("path");
 const crypto = require("crypto");
 const { compressPdf } = require("../engines/compression/compression.engine");
 const { createFileMetadata, markProcessed, deleteFileRecord } = require("../services/storage/fileRepository");
-const { uploadTemporaryFile, BUCKET } = require("../services/storage/supabaseStorage");
+const {
+  uploadTemporaryFile,
+  removeTemporaryFile,
+  BUCKET
+} = require("../services/storage/supabaseStorage");
+
 const { getDeleteAt } = require("../services/filePolicy");
 
 async function compressPdfHandler(req, res, next) {
   let outputDir;
-  let fileId;
+let fileId;
+let storagePath;
 
   try {
     if (!req.file) {
@@ -35,8 +41,8 @@ async function compressPdfHandler(req, res, next) {
     outputDir = result.outputDir;
 
     const outputName = path.basename(result.outputPath);
-    const storagePath = `processed/compression/${fileId}/${crypto.randomUUID()}-${outputName}`;
-
+storagePath = `processed/compression/${fileId}/${crypto.randomUUID()}-${outputName}`;
+    
     await uploadTemporaryFile(result.outputPath, storagePath, "application/pdf");
 
     const processed = await markProcessed(fileId, {
@@ -70,7 +76,14 @@ async function compressPdfHandler(req, res, next) {
       }
     });
   } catch (error) {
-    if (fileId) await deleteFileRecord(fileId).catch(() => {});
+if (storagePath) {
+  await removeTemporaryFile(storagePath).catch(() => {});
+}
+
+if (fileId) {
+  await deleteFileRecord(fileId).catch(() => {});
+}
+
     next(error);
   } finally {
     if (req.file?.path) await fs.rm(req.file.path, { force: true }).catch(() => {});
