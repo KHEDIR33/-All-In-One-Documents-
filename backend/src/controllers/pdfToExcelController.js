@@ -3,12 +3,19 @@ const path = require("path");
 const crypto = require("crypto");
 const { pdfToExcel } = require("../engines/pdfToExcel/pdfToExcel.engine");
 const { createFileMetadata, markProcessed, deleteFileRecord } = require("../services/storage/fileRepository");
-const { uploadTemporaryFile, BUCKET } = require("../services/storage/supabaseStorage");
+const {
+  uploadTemporaryFile,
+  removeTemporaryFile,
+  BUCKET
+} = require("../services/storage/supabaseStorage");
+
+
 const { getDeleteAt } = require("../services/filePolicy");
 
 async function convertPdfToExcel(req, res, next) {
   let outputDir;
-  let fileId;
+let fileId;
+let storagePath;
 
   try {
     if (!req.file) {
@@ -32,7 +39,8 @@ async function convertPdfToExcel(req, res, next) {
     outputDir = result.outputDir;
 
     const outputName = path.basename(result.outputPath);
-    const storagePath = `processed/pdf-to-excel/${fileId}/${crypto.randomUUID()}-${outputName}`;
+storagePath = `processed/pdf-to-excel/${fileId}/${crypto.randomUUID()}-${outputName}`;
+    
 
     await uploadTemporaryFile(
       result.outputPath,
