@@ -3,7 +3,12 @@ const path = require("path");
 const crypto = require("crypto");
 const { editPdf } = require("../engines/pdfEdit/pdfEdit.engine");
 const { createFileMetadata, markProcessed, deleteFileRecord } = require("../services/storage/fileRepository");
-const { uploadTemporaryFile, BUCKET } = require("../services/storage/supabaseStorage");
+const {
+  uploadTemporaryFile,
+  removeTemporaryFile,
+  BUCKET
+} = require("../services/storage/supabaseStorage");
+
 const { getDeleteAt } = require("../services/filePolicy");
 
 /**
@@ -19,6 +24,7 @@ const { getDeleteAt } = require("../services/filePolicy");
 async function editPdfHandler(req, res, next) {
   let outputDir;
   let fileId;
+  let storagePath;
 
   try {
     if (!req.file) {
@@ -53,7 +59,7 @@ async function editPdfHandler(req, res, next) {
     outputDir = result.outputDir;
 
     const outputName = path.basename(result.outputPath);
-    const storagePath = `processed/pdf-edit/${fileId}/${crypto.randomUUID()}-${outputName}`;
+    storagePath = `processed/pdf-edit/${fileId}/${crypto.randomUUID()}-${outputName}`;
 
     await uploadTemporaryFile(result.outputPath, storagePath, "application/pdf");
 
@@ -82,7 +88,13 @@ async function editPdfHandler(req, res, next) {
       }
     });
   } catch (error) {
-    if (fileId) await deleteFileRecord(fileId).catch(() => {});
+    if (storagePath) {
+  await removeTemporaryFile(storagePath).catch(() => {});
+}
+
+if (fileId) {
+  await deleteFileRecord(fileId).catch(() => {});
+}
 
     if (error.code === "NO_ANNOTATIONS") {
       return res.status(400).json({ success: false, code: error.code, message: error.message });
