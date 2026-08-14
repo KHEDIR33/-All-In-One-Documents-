@@ -71,7 +71,13 @@ storagePath = `processed/pdf-to-excel/${fileId}/${crypto.randomUUID()}-${outputN
       analysis: result.analysis
     });
   } catch (error) {
-    if (fileId) await deleteFileRecord(fileId).catch(() => {});
+if (storagePath) {
+  await removeTemporaryFile(storagePath).catch(() => {});
+}
+
+if (fileId) {
+  await deleteFileRecord(fileId).catch(() => {});
+}
 
     next(error);
   } finally {
