@@ -32,6 +32,10 @@ async function hasFileAccess({
 
   // A local/service payment is attached to the exact processed file
   // or exact searchable document.
+
+  if ((fileId || documentId) && !customerRef) {
+  return false;
+}
   if (fileId || documentId) {
     let query = supabase
       .from("access_grants")
@@ -43,9 +47,11 @@ async function hasFileAccess({
       query = query.eq("document_id", documentId);
     }
 
-    query = query.eq("service", service);
+    query = query
+  .eq("service", service)
+  .eq("customer_ref", customerRef);
 
-    const { data: grants, error } = await query;
+const { data: grants, error } = await query;
     if (error) throw error;
 
     if ((grants || []).some(grant => {
