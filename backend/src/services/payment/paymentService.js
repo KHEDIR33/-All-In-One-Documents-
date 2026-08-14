@@ -59,9 +59,18 @@ async function verifyAndGrantAccess({ paymentId, providerTransactionId }) {
   const { data: existing } = await supabase
     .from("payments").select("*").eq("id", paymentId).maybeSingle();
 
-  if (existing?.status === "verified") {
-    return { payment: existing, alreadyVerified: true };
-  }
+if (existing?.status === "verified") {
+  // Payment is already verified. Re-check/recreate the access grant
+  // so a previous grant failure can be recovered safely.
+  const grant = await grantFromVerifiedPayment(existing);
+
+  return {
+    payment: existing,
+    grant,
+    alreadyVerified: true
+  };
+}
+
 
   const { data: payment, error } = await supabase
     .from("payments")
