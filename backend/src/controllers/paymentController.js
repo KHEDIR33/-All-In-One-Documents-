@@ -117,11 +117,17 @@ async function handleWebhook(req, res, next) {
 
     return res.json({ success: true });
   } catch (error) {
-    // Always return 200 to provider to prevent retries on our processing errors
-    console.error(`Webhook processing error (${gateway}):`, error.message);
-    return res.status(200).json({ success: false, message: "Webhook received (processing error)" });
+    console.error(
+      `Webhook processing error (${gateway}):`,
+      error.message
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Webhook processing failed"
+    });
   }
-}
+
 
 // ---------------------------------------------------------------------------
 // Extract payment data from provider-specific webhook payloads
