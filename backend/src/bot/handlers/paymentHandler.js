@@ -23,18 +23,20 @@ function paymentPopup(context) {
   return {
     inline_keyboard: [
       [
-        { text: "📱 Telebirr",   callback_data: `p:${context}:telebirr` },
-        { text: "🏦 CBE",        callback_data: `p:${context}:cbe` },
-        { text: "🏦 Dashen",     callback_data: `p:${context}:dashen` }
+        { text: "📱 Telebirr",  callback_data: `p:${context}:telebirr` },
+        { text: "🏦 CBE",       callback_data: `p:${context}:cbe` },
+        { text: "🏦 Dashen",    callback_data: `p:${context}:dashen` },
+        { text: "🏦 Abyssinia", callback_data: `p:${context}:abyssinia` }
       ],
       [
-        { text: "🏦 Abyssinia",  callback_data: `p:${context}:abyssinia` },
-        { text: "🌎 Airtm",      callback_data: `p:${context}:airtm` },
-        { text: "🌎 PayPal",     callback_data: `p:${context}:paypal` }
+        { text: "🌎 Airtm",  callback_data: `p:${context}:airtm` },
+        { text: "🌎 Paddle", callback_data: `p:${context}:paddle` },
+        { text: "🌎 PayPal", callback_data: `p:${context}:paypal` }
       ]
     ]
   };
 }
+      
 
 // ---------------------------------------------------------------------------
 // Show payment popup — called after conversion or document download
@@ -55,8 +57,9 @@ async function showPaymentPopup(chatId, { fileId, documentId, service, label }) 
 
   await sendMessage(chatId,
     `✅ <b>${label}</b> ተጠናቅቋል!\n\n` +
-    `💾 ለማስቀመጥ ይክፈሉ — <b>${amount}</b>\n\n` +
-    `👇 የክፍያ ዘዴ ይምረጡ:`,
+`💾 ፋይሉን ለማስቀመጥ የክፍያ ዘዴ ይምረጡ:\n\n` +
+`🇪🇹 <b>LOCAL</b>\n` +
+`🌎 <b>INTERNATIONAL</b>`,              
     { reply_markup: paymentPopup(context) }
   );
 }
@@ -105,8 +108,6 @@ async function handlePaymentSelection(chatId, userId, callbackQueryId, callbackD
       step: "awaiting_payment_confirmation",
       paymentId: data.payment.id
     });
-
-    const amount = market === "local" ? "3 ብር (ETB)" : "$1 (USD - 7 ቀን)";
 
     await sendMessage(chatId,
       `💳 <b>ክፍያ</b>\n\n` +
