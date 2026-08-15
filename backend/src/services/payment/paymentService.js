@@ -8,8 +8,7 @@ const {
 } = require("./paymentRouter");
 const { grantFromVerifiedPayment } = require("../access/accessService");
 
-idempotency_key:
-  data.idempotencyKey || crypto.randomUUID(),
+idempotency_key: data.idempotencyKey || null,
 // ---------------------------------------------------------------------------
 // Create payment record + initiate with provider
 // ---------------------------------------------------------------------------
@@ -17,6 +16,13 @@ async function createPayment(data) {
   const market = data.market || getMarket(data.provider);
   const intent = createPaymentIntent({ ...data, market });
   const paymentKey = crypto.randomUUID();
+if (data.idempotencyKey) {
+  const { data: existing, error: lookupError } =
+    await supabase
+      .from("payments")
+      .select("*")
+      .eq("idempotency_key", data.idempotencyKey)
+      .maybeSingle();
 
   const { data: payment, error } = await supabase
     .from("payments")
