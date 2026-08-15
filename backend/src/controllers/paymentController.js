@@ -1,12 +1,5 @@
 const paymentService = require("../services/payment/paymentService");
 const { getWebhookAdapter } = require("../services/payment/paymentRouter");
-headers: {
-  "Content-Type": "application/json",
-  "x-bot-internal-secret":
-    process.env.BOT_INTERNAL_SECRET
-}
-
-idempotencyKey
 // ---------------------------------------------------------------------------
 // POST /api/payments/create
 // Body: { fileId?, service, provider, customerRef?, returnUrl?, email?, firstName? }
