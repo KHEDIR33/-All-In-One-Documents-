@@ -113,7 +113,6 @@ async function verifyAndGrantAccess({
   verifiedCurrency
 }) {
 
-}) {
   if (!paymentId || !providerTransactionId) {
     throw new Error("paymentId and providerTransactionId are required");
   }
