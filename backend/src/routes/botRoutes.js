@@ -30,7 +30,16 @@ router.post(
 // paymentController.js calls this when:
 //   payment.customer_ref looks like a Telegram user_id (numeric string)
 // ---------------------------------------------------------------------------
-router.post(
+const incoming =
+  req.headers["x-bot-internal-secret"] || "";
+
+if (
+  !BOT_INTERNAL_SECRET ||
+  incoming !== BOT_INTERNAL_SECRET
+) {
+  return res.status(401).json({ ok: false });
+}
+router.post
   "/payment-confirmed",
   express.json(),
   async (req, res) => {
