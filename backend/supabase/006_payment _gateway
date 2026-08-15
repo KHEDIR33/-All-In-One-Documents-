@@ -1,0 +1,5 @@
+alter table public.payments
+  add column if not exists provider_gateway text;
+
+create index if not exists payments_gateway_idx
+  on public.payments(provider_gateway);
