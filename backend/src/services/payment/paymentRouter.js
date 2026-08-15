@@ -26,6 +26,26 @@ function getMarket(provider) {
   if (INTERNATIONAL_PROVIDERS.has(p)) return "international";
   throw new Error(`Unknown payment provider: ${provider}`);
 }
+const result = await chapaAdapter.initiatePayment(params);
+const result = await chapaAdapter.initiatePayment(params);
+return { ...result, gateway: "chapa" };
+const result = await santimPayAdapter.initiatePayment(params);
+return { ...result, gateway: "santimpay" };
+if (provider === "airtm") {
+  const result = await airtmAdapter.initiatePayment(params);
+  return { ...result, gateway: "airtm" };
+}
+
+if (provider === "paddle") {
+  const result = await paddleAdapter.initiatePayment(params);
+  return { ...result, gateway: "paddle" };
+}
+
+if (provider === "paypal") {
+  const result = await paypalAdapter.initiatePayment(params);
+  return { ...result, gateway: "paypal" };
+}
+
 
 /**
  * Initiate a payment through the correct adapter.
