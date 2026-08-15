@@ -1,7 +1,11 @@
 const crypto = require("crypto");
 const { supabase } = require("../../config/database");
 const { createPaymentIntent } = require("../../engines/payment/payment.engine");
-const { initiatePayment: routerInitiate, getMarket } = require("./paymentRouter");
+const {
+  initiatePayment: routerInitiate,
+  getMarket,
+  getWebhookAdapter
+} = require("./paymentRouter");
 const { grantFromVerifiedPayment } = require("../access/accessService");
 
 // ---------------------------------------------------------------------------
@@ -50,7 +54,11 @@ async function createPayment(data) {
 // ---------------------------------------------------------------------------
 // Called only by trusted webhook handlers after authentic verification
 // ---------------------------------------------------------------------------
-async function verifyAndGrantAccess({ paymentId, providerTransactionId }) {
+async function verifyAndGrantAccess({
+  paymentId,
+  providerTransactionId,
+  gateway
+}) {
   if (!paymentId || !providerTransactionId) {
     throw new Error("paymentId and providerTransactionId are required");
   }
