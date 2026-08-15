@@ -6,11 +6,16 @@ headers: {
     process.env.BOT_INTERNAL_SECRET
 }
 
-
+idempotencyKey
 // ---------------------------------------------------------------------------
 // POST /api/payments/create
 // Body: { fileId?, service, provider, customerRef?, returnUrl?, email?, firstName? }
 // ---------------------------------------------------------------------------
+const idempotencyKey =
+  req.get("Idempotency-Key") ||
+  req.body.idempotencyKey ||
+  null;
+
 async function createPayment(req, res, next) {
   try {
     const { fileId, documentId, service, provider, customerRef, returnUrl, email, firstName } = req.body;
