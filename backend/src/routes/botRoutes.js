@@ -6,7 +6,7 @@ const { supabase } = require("../config/database");
 const router = express.Router();
 
 const BOT_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
-
+const BOT_INTERNAL_SECRET = process.env.BOT_INTERNAL_SECRET;
 // ---------------------------------------------------------------------------
 // POST /bot/webhook — Telegram updates
 // ---------------------------------------------------------------------------
