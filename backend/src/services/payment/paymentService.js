@@ -100,6 +100,17 @@ if (
   throw new Error("Payment currency mismatch");
 }
 
+if (
+  payment.access_type === "seven_day" &&
+  !alreadyVerified
+) {
+  await recordServiceUsage({
+    customerRef: payment.customer_ref,
+    service: payment.service
+  });
+}
+
+  
 // ---------------------------------------------------------------------------
 // Called only by trusted webhook handlers after authentic verification
 // ---------------------------------------------------------------------------
@@ -116,16 +127,6 @@ async function verifyAndGrantAccess({
   if (!paymentId || !providerTransactionId) {
     throw new Error("paymentId and providerTransactionId are required");
   }
-
-if (
-  payment.access_type === "seven_day" &&
-  !alreadyVerified
-) {
-  await recordServiceUsage({
-    customerRef: payment.customer_ref,
-    service: payment.service
-  });
-}
   
 
   // Idempotency — if already verified, just return the existing payment
