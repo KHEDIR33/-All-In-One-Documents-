@@ -120,8 +120,8 @@ async function verifyAndGrantAccess({
   paymentId,
   providerTransactionId,
   gateway,
-  verifiedAmount,
   verifiedCurrency
+  verifiedAmount, 
 }) {
 
   if (!paymentId || !providerTransactionId) {
