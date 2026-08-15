@@ -32,6 +32,29 @@ async function createPayment(req, res, next) {
     next(error);
   }
 }
+async function verifyProviderTransaction(
+  gateway,
+  paymentId,
+  providerTransactionId
+) {
+  const adapter = getWebhookAdapter(gateway);
+
+  const lookupId =
+    gateway === "paddle" || gateway === "paypal"
+      ? providerTransactionId
+      : paymentId;
+
+  const result = await adapter.verifyTransaction(lookupId);
+
+  if (!result?.verified) {
+    throw new Error(
+      `Provider transaction verification failed for ${gateway}`
+    );
+  }
+
+  return result;
+}
+
 
 // ---------------------------------------------------------------------------
 // GET /api/payments/:id/status
