@@ -3,7 +3,12 @@ const fs = require("fs/promises");
 const { searchDocuments, getDocumentPreview, getRelatedDocuments } = require("../services/search/documentSearchService");
 const { createDownloadSession, markDownloadReady, getDownloadSession, deleteDownloadSession } = require("../services/search/documentRepository");
 const { hasFileAccess } = require("../services/access/accessService");
-const { uploadTemporaryFile, createDownloadUrl, BUCKET } = require("../services/storage/supabaseStorage");
+const {
+  uploadTemporaryFile,
+  createDownloadUrl,
+  removeTemporaryFile,
+  BUCKET
+} = require("../services/storage/supabaseStorage");
 const { supabase } = require("../config/database");
 
 // GET /api/documents/search?q=&language=&category=&file_type=
@@ -34,6 +39,8 @@ async function preview(req, res, next) {
 async function prepareDownload(req, res, next) {
   let tempPath;
   let sessionId;
+  let storagePath;
+  
   try {
     const documentId = req.params.id;
     const customerRef = req.get("x-customer-ref") || null;
@@ -66,8 +73,8 @@ async function prepareDownload(req, res, next) {
     const sourceResponse = await fetch(docWithSource.source_url);
     if (!sourceResponse.ok) throw new Error(`Failed to fetch source: HTTP ${sourceResponse.status}`);
     await fs.writeFile(tempPath, Buffer.from(await sourceResponse.arrayBuffer()));
-
-    const storagePath = `documents/temp/${sessionId}/${crypto.randomUUID()}.${ext}`;
+  storagePath =
+  `documents/temp/${sessionId}/${crypto.randomUUID()}.${ext}`;
     const mimeMap = {
       pdf: "application/pdf",
       docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -83,8 +90,17 @@ async function prepareDownload(req, res, next) {
       session: { id: ready.id, expires_at: ready.delete_at }
     });
   } catch (error) {
-    if (sessionId) await deleteDownloadSession(sessionId).catch(() => {});
-    next(error);
+    if (storagePath) {
+  await removeTemporaryFile(storagePath).catch(() => {});
+}
+
+if (sessionId) {
+  await deleteDownloadSession(sessionId).catch(() => {});
+}
+
+next(error);
+
+    
   } finally {
     if (tempPath) await fs.rm(tempPath, { force: true }).catch(() => {});
   }
