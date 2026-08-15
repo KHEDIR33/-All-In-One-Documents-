@@ -51,13 +51,39 @@ async function createPayment(data) {
   return { payment, checkoutUrl: providerResult.checkoutUrl };
 }
 
+if (
+  payment.provider_gateway &&
+  payment.provider_gateway !== gateway
+) {
+  throw new Error("Payment gateway mismatch");
+}
+
+if (
+  verifiedAmount == null ||
+  Number(verifiedAmount) !== Number(payment.amount)
+) {
+  throw new Error("Payment amount mismatch");
+}
+
+if (
+  !verifiedCurrency ||
+  String(verifiedCurrency).toUpperCase() !==
+    String(payment.currency).toUpperCase()
+) {
+  throw new Error("Payment currency mismatch");
+}
+
 // ---------------------------------------------------------------------------
 // Called only by trusted webhook handlers after authentic verification
 // ---------------------------------------------------------------------------
 async function verifyAndGrantAccess({
   paymentId,
   providerTransactionId,
-  gateway
+  gateway,
+  verifiedAmount,
+  verifiedCurrency
+}) {
+
 }) {
   if (!paymentId || !providerTransactionId) {
     throw new Error("paymentId and providerTransactionId are required");
