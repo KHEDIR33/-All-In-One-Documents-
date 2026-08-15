@@ -76,6 +76,8 @@ if (
 // ---------------------------------------------------------------------------
 // Called only by trusted webhook handlers after authentic verification
 // ---------------------------------------------------------------------------
+const { recordServiceUsage } = require("../access/usageService");
+
 async function verifyAndGrantAccess({
   paymentId,
   providerTransactionId,
@@ -88,6 +90,17 @@ async function verifyAndGrantAccess({
   if (!paymentId || !providerTransactionId) {
     throw new Error("paymentId and providerTransactionId are required");
   }
+
+if (
+  payment.access_type === "seven_day" &&
+  !alreadyVerified
+) {
+  await recordServiceUsage({
+    customerRef: payment.customer_ref,
+    service: payment.service
+  });
+}
+  
 
   // Idempotency — if already verified, just return the existing payment
   const { data: existing } = await supabase
